@@ -1,0 +1,7 @@
+{
+  "name": "dcf77webreceiver-server",
+  "version": "0.0.1",
+  "dependencies": {
+    "onoff": "0.3.0"
+  }
+}
