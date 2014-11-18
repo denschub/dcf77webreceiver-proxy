@@ -1,46 +1,29 @@
 var net = require("net"),
-    Gpio = require("onoff").Gpio,
-    Signal = require("./lib/signal.js"),
 
-    settings = {
-      gpio: {
-        port: 17,
-        bindOptions: {
-          persistentWatch: true
-        }
-      },
-      server: {
-        // the servers IP address
-        host: "1.2.3.4",
-        port: 20042
-      }
+    // for the dcf77webreceiver-server
+    inputSettings = {
+      host: "0.0.0.0",
+      port: 20042
+    },
+
+    // for socket.io
+    outputSettings = {
+      port: 10042
     };
 
-function onClientConnect()
-{
-  console.log("connected!");
-  signal.bindTcpConnection(client);
-}
+var socketio = require("socket.io").listen(outputSettings.port);
 
-function onClientError()
-{
-  console.log("connection lost...");
-  process.exit();
-}
-
-var antenna = new Gpio(settings.gpio.port, "in", "both", settings.gpio.bindOptions),
-    signal = new Signal(),
-    client = new net.Socket();
-
-client.setNoDelay(true);
-client.connect(settings.server.port, settings.server.host);
-client.on("connect", onClientConnect)
-      .on("end", onClientError)
-      .on("timeout", onClientError)
-      .on("error", onClientError)
-      .on("close", onClientError);
-
-antenna.watch(function(err, value) {
-  if(err) return;
-  signal.receiveBit(value);
+socketio.configure('production', function(){
+  socketio.set('log level', 1);
 });
+
+socketio.configure('development', function(){
+  socketio.set('log level', 1);
+});
+
+net.createServer(function(sock) {
+  sock.on("data", function(data) {
+    socketio.sockets.emit("dcf77signal", data.toString());
+  });
+}).listen(inputSettings.port, inputSettings.host);
+console.log("input server listening on " + inputSettings.host +":"+ inputSettings.port);
