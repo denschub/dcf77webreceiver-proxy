@@ -1,7 +1,7 @@
 {
-  "name": "dcf77webreceiver-server",
-  "version": "0.0.1",
+  "name": "dcf77webreceiver-proxy",
+  "version": "2.0.0",
   "dependencies": {
-    "socket.io": "0.9.16"
+    "socket.io": "1.4.5"
   }
 }
